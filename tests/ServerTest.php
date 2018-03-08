@@ -132,7 +132,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 * @return \PHPUnit_Framework_MockObject_MockObject
 	 */
 	public function getValidateMessageFaultMock() {
-		$mock = $this->getMock(__NAMESPACE__.'\ServerProxy', array('fault', 'getCallback'));
+		$mock = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('fault', 'getCallback'))
+			->getMock();
+
 		$mock->expects($this->once())->method('fault')->will(($this->returnArgument(0)));
 		$mock->expects($this->any())->method('getCallback')->will($this->returnValue('callback'));
 
@@ -140,7 +144,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function getValidateMessageSuccessMock() {
-		$mock = $this->getMock(__NAMESPACE__.'\ServerProxy', array('fault', 'getCallback'));
+		$mock = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('fault', 'getCallback'))
+			->getMock();
+
 		$mock->expects($this->never())->method('fault');
 		$mock->expects($this->any())->method('getCallback')->will($this->returnValue('callback'));
 
@@ -218,10 +226,18 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	public function fault() {
 		$id = 'test';
 
-		$fault = $this->getMock(__NAMESPACE__.'\Fault', array('toArray'));
+		$fault = $this
+			->getMockBuilder(__NAMESPACE__.'\Fault')
+			->setMethods(array('toArray'))
+			->getMock();
+
 		$fault->expects($this->once())->method('toArray')->will($this->returnValue(array('fault')));
 
-		$obj = $this->getMock(__NAMESPACE__.'\ServerProxy', array('getMessageStub'));
+		$obj = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('getMessageStub'))
+			->getMock();
+
 		$obj->expects($this->once())->method('getMessageStub')->with($id)->will(
 				$this->returnValue(array('stub'))
 			);
@@ -251,7 +267,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 		$namespace = 'foo';
 		$methods = get_class_methods($object);
 
-		$obj = $this->getMock(__NAMESPACE__.'\ServerProxy', array('registerFunction'));
+		$obj = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('registerFunction'))
+			->getMock();
+
 		$obj->expects($this->exactly(count($methods)))->method('registerFunction')->will($this->returnSelf());
 
 		$obj->registerObject($object, $namespace);
@@ -269,7 +289,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 
 		$expected = array($rp_name => $callback);
 
-		$obj = $this->getMock(__NAMESPACE__.'\ServerProxy', array('wrapCallback', 'getRemoteProcedureName'));
+		$obj = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('wrapCallback', 'getRemoteProcedureName'))
+			->getMock();
+
 		$obj->expects($this->once())->method('wrapCallback')->with($callback)->will($this->returnArgument(0));
 		$obj->expects($this->once())->method('getRemoteProcedureName')->with($name, $namespace)->will($this->returnValue($rp_name));
 
@@ -282,7 +306,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 * @testdox Server::validateMessage() return true on valid message
 	 */
 	public function validateMessageReturnsTrueOnSuccess() {
-		$obj = $this->getMock(__NAMESPACE__.'\ServerProxy', array('fault', 'getCallback'));
+		$obj = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('fault', 'getCallback'))
+			->getMock();
+
 		$obj->set(
 			'callbacks',
 			array(
@@ -334,7 +362,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 		$message = clone $this->message;
 		$message->method = 'nonexisting';
 
-		$obj = $this->getMock(__NAMESPACE__.'\ServerProxy', array('fault', 'getCallback'));
+		$obj = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('fault', 'getCallback'))
+			->getMock();
+
 		$obj->expects($this->once())->method('fault')->will(($this->returnArgument(0)));
 		$obj->expects($this->once())->method('getCallback')->with('nonexisting')->will($this->returnValue(false));
 
@@ -426,7 +458,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 			'result' => $result,
 		);
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('getMessageStub'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('fault', 'getMessageStub'))
+			->getMock();
+
 		$sut->expects($this->once())->method('getMessageStub')->with($message_id)->will(
 				$this->returnValue(array())
 			);
@@ -435,7 +471,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function getHandleCallbackExceptionMock($message_id, $exception_class) {
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('isExceptionRegistered', 'fault'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('fault', 'isExceptionRegistered'))
+			->getMock();
+
 		$sut->expects($this->once())->method('fault')->with($this->isInstanceOf($exception_class), $message_id)
 			->will($this->returnValue(true));
 
@@ -487,7 +527,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function handleMessageReturnsValidationResultOnError() {
 		$message = new \stdClass();
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('validateMessage'));
+
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('validateMessage'))
+			->getMock();
 
 		$sut->expects($this->once())->method('validateMessage')->with($message)->will(
 				$this->returnValue('something')
@@ -511,7 +555,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	public function handleMessageReturnsResultOnMessage($message_id, $expected) {
 		$message = (object) array('id' => $message_id, 'method' => 'blah', 'params' => array());
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('validateMessage', 'getCallback', 'handleCallbackResponse', 'invokeCallback', 'handleCallbackException'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('validateMessage', 'getCallback', 'handleCallbackResponse', 'invokeCallback', 'handleCallbackException'))
+			->getMock();
 
 		$sut->expects($this->once())
 			->method('validateMessage')
@@ -547,7 +594,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	public function handleMessageReturnsResultOnFault($message_id, $expected) {
 		$message = (object) array('id' => $message_id, 'method' => 'blah', 'params' => array());
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('validateMessage', 'getCallback', 'handleCallbackResponse', 'handleCallbackException', 'invokeCallback'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('validateMessage', 'getCallback', 'handleCallbackResponse', 'handleCallbackException', 'invokeCallback'))
+			->getMock();
 
 		$sut->expects($this->once())
 			->method('validateMessage')
@@ -580,7 +630,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 * @testdox Server::handle() returns proper result on json parse error
 	 */
 	public function handleReturnsFaultOnDecodeError() {
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('jsonEncode', 'jsonDecode', 'fault'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('jsonEncode', 'jsonDecode', 'fault'))
+			->getMock();
 
 		$request = 'test_request';
 		$json_encode_result = 'encode_result';
@@ -612,7 +665,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 			'some' => 'value',
 		);
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('handleMessage', 'jsonEncode', 'jsonDecode'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('handleMessage', 'jsonEncode', 'jsonDecode'))
+			->getMock();
 
 		$sut->expects($this->once())->method('jsonDecode')->with($request)->will(
 				$this->returnValue($jsondecode_result)
@@ -645,7 +701,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 
 		$response = 'test_response';
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('handleMessage', 'jsonEncode', 'jsonDecode'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('handleMessage', 'jsonEncode', 'jsonDecode'))
+			->getMock();
 
 		$sut->expects($this->once())->method('jsonDecode')->with($request)->will(
 				$this->returnValue($jsondecode_result)
@@ -667,7 +726,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 * @testdox Server::handle() returns null request having no return value (notification)
 	 */
 	public function handleReturnsNullOnNotifications() {
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('handleMessage', 'jsonEncode', 'jsonDecode'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('handleMessage', 'jsonEncode', 'jsonDecode'))
+			->getMock();
 
 		$sut->expects($this->once())->method('jsonDecode')->will($this->returnValue(new \stdClass()));
 
@@ -749,7 +811,11 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 		$factory = 'factory';
 		$object = 'object';
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('invokeCallback', 'registerObject'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('invokeCallback', 'registerObject'))
+			->getMock();
+
 		$sut->set('factories', array($namespace => $factory));
 
 		$sut->expects($this->once())
@@ -774,7 +840,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 		$method = 'namespace.method';
 		$parsed = array('namespace', 'method');
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('parseRemoteProcedureName', 'resolveFactory'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('parseRemoteProcedureName', 'resolveFactory'))
+			->getMock();
 
 		$sut->expects($this->once())
 			->method('parseRemoteProcedureName')
@@ -797,7 +866,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 		$callback = 'callback';
 
 
-		$sut = $this->getMock(__NAMESPACE__.'\ServerProxy', array('parseRemoteProcedureName', 'resolveFactory'));
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\ServerProxy')
+			->setMethods(array('parseRemoteProcedureName', 'resolveFactory'))
+			->getMock();
 
 		$sut->set('callbacks', array($method => $callback));
 

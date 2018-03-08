@@ -81,7 +81,7 @@ class FaultTest extends \PHPUnit_Framework_TestCase {
 	 * @testdox Fault::__construct() calls Fault::setData()
 	 */
 	public function constructorCallsSetData() {
-		$sut = $this->getMock(__NAMESPACE__.'\FaultProxy', array('setData'));
+		$sut = $this->getMockBuilder(__NAMESPACE__.'\FaultProxy', array('setData'))->getMock();
 		$sut->expects($this->once())
 			->method('setData')
 			->with('foo')
@@ -135,7 +135,13 @@ class FaultTest extends \PHPUnit_Framework_TestCase {
 	public function toArrayReturnsStructWithoutAdditionalData() {
 		$message = 'test message';
 		$code = 1337;
-		$sut = $this->getMock(__NAMESPACE__.'\FaultProxy', array('getData'), array($message, $code));
+
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\FaultProxy')
+			->setMethods(array('getData'))
+			->setConstructorArgs(array($message, $code))
+			->getMock();
+
 		$sut->expects($this->once())
 			->method('getData')
 			->will($this->returnValue(null))
@@ -157,7 +163,13 @@ class FaultTest extends \PHPUnit_Framework_TestCase {
 		$message = 'test message';
 		$code = 1337;
 		$data = 'foo';
-		$sut = $this->getMock(__NAMESPACE__.'\FaultProxy', array('getData'), array($message, $code));
+
+		$sut = $this
+			->getMockBuilder(__NAMESPACE__.'\FaultProxy')
+			->setMethods(array('getData'))
+			->setConstructorArgs(array($message, $code))
+			->getMock();
+
 		$sut->expects($this->once())
 			->method('getData')
 			->will($this->returnValue($data))
