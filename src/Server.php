@@ -44,7 +44,7 @@
 
 namespace Lx\JsonRpcXp;
 
-use Lx\Fna\Wrapper as CallbackWrapper;
+use Fna\Wrapper as CallbackWrapper;
 
 /**
  * Class Server
@@ -221,7 +221,7 @@ class Server extends Base {
 	 *
 	 * @param callable $callback
 	 *
-	 * @return \Lx\Fna\Wrapper
+	 * @return CallbackWrapper
 	 */
 	protected function wrapCallback($callback) {
 		return new CallbackWrapper($callback);
