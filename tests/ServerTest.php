@@ -44,6 +44,8 @@
 
 namespace Lx\JsonRpcXp;
 
+use Fna\Wrapper;
+
 require_once __DIR__.'/../vendor/autoload.php';
 
 /**
@@ -435,7 +437,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function wrapCallback() {
 		$this->assertInstanceOf(
-			'\Lx\Fna\Wrapper',
+			Wrapper::class,
 			$this->obj->call(
 				'wrapCallback',
 				array(
